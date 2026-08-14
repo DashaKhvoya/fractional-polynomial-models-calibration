@@ -33,24 +33,24 @@ On the one hand, the Fukasawa formula allows us to extract all moments of the lo
 └────────────────────┬────────────────────┘                             └────────────────────┬──────────────────────┘
                      │                                                                       │
                      │                                                                       │
-                     └────────────────────────────┐               ┌──────────────────────────┘
-                                                  │               │
-                                                  ▼               ▼
-                                     ┌──────────────────────────────────────────┐
-                                     │          Parameter optimization          │
-                                     |      Minimize relative moment error      |
-                                     └──────────────────────────────────────────┘                                     
+                     └──────────────────────────┐               ┌────────────────────────────┘
+                                                │               │
+                                                ▼               ▼
+                                   ┌──────────────────────────────────────────┐
+                                   │          Parameter optimization          │
+                                   |      Minimize relative moment error      |
+                                   └──────────────────────────────────────────┘                                     
 ```
 
 ### Fractional polynomial processes
 A **polynomial process** $X_t$ is a Markov process with extended generator $\mathbb{G}$, such that $\forall k \geq 0: \mathbb{G}(\mathcal{P}_k) \subseteq \mathcal{P}_k$, i.e., its generator maps polynomials to polynomials of the same or lower degree.
 
-**Inverse $\alpha$-stable subordinator** $L_t$ is the hitting time process: $$L_t = \inf \{ s > 0 : \sigma_s > t \}, \quad t \geq 0,$$
-where $\sigma_s$ is an $\alpha$-stable Lévy subordinator with $\alpha \in (0, 1)$. This is a non-decreasing process interpreted as a stochastic time change. The smaller $\alpha$ is, the longer and more frequent these horizontal, flat segments become.
+**Inverse $\alpha$-stable subordinator** $L_t$ is the hitting time process: $$L_t = \inf \\{ s > 0 : \sigma_s > t \\}, \quad t \geq 0,$$
+where $\sigma_s$ is an $\alpha$-stable Lévy subordinator with $\alpha \in (0, 1)$. This is a non-decreasing process interpreted as a stochastic time change. The smaller $\alpha$ is, the longer and more frequent horizontal, flat segments become.
 
-A **fractional polynomial process** $Y_t = X_{L_t}$ is constructed by time-changing a classical polynomial process $X_t$ (e.g., Heston model) with an independent inverse $\alpha$-stable subordinator $L_t$. This process loses the Markov property, and its autocorrelation decays much slower, following a power law with exponent $\alpha$, which creates the long memory effect.
+A **fractional polynomial process** $Y_t = X_{L_t}$ is constructed by time-changing a classical polynomial process $X_t$ with an independent inverse $\alpha$-stable subordinator $L_t$. This process loses the Markov property, and its autocorrelation decays much slower, following a power law with exponent $\alpha$, which creates the long memory effect.
 
-<img src="Charts/heston_trajectories.png" width="500" alt="Trajectory examples">
+<img src="Charts/heston_trajectories.png" width="700" alt="Trajectory examples">
 
 ### Model-free market moments (Fukasawa formula)
 Empirical moments of the log-price process are extracted directly from observable implied volatility smiles without assuming a specific underlying model:
