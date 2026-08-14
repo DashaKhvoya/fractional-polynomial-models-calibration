@@ -87,9 +87,11 @@ All python scripts can be found here: [Implementation](Implementation/).
 ### Synthetic volatility smiles
 First of all, for the controlled experiment, we need to be able to construct volatility smiles for defined fractional Heston models. In [Implementation/DataGeneration](Implementation/DataGeneration/) we generate volatility smiles using Monte-Carlo simulations, where for generating the paths we use our implementation of fractional Heston model from [Implementation/HestonModel](Implementation/HestonModel/). 
 
-For tests we chose three base parameter sets for the fractional Heston model: standard market, high leverage, and a parameter set violating the Feller condition. For each set, we ran 8 experiments, varying the $\alpha$ parameter from 0.3 to 1.0. In total, this gave us 24 test scenarios for different expiration times. Below are examples of the generated smiles for a 9-month expiration. It is clearly seen how parameter $\alpha$ transforms the shape of the implied volatility curve: it becomes much more convex.
+For tests we chose three base parameter sets for the fractional Heston model: standard market, high leverage market, and a parameter set violating the Feller condition. For each set, we ran 8 experiments, varying the $\alpha$ parameter from 0.3 to 1.0. In total, this gave us 24 test scenarios for different expiration times. Below are examples of the generated smiles for a 9-month expiration. It is clearly visible how the parameter $\alpha$ transforms the shape of the implied volatility curve, it becomes much more convex.
 
-<img src="Charts/ivs_examples.png" width="500" alt="Implied volatilities examples">
+<img src="Charts/ivs_examples.png" width="800" alt="Implied volatilities examples">
+
+Volatility smiles for all 24 tests and expiration times can be found here: [SimulatedData](SimulatedData/).
 
 ### Fukasawa: SVI-extrapolation and numerical integration
 The Fukasawa formula requires computing an integral over an infinite interval. However, in practice, the available market option strikes are strictly bounded. This graph shows the integrands for moments of order 1-4. The red dots represent values we can obtain directly from observable market data. As you can see, they only cover the central part, and the integrand does not converge to zero within this range. 
