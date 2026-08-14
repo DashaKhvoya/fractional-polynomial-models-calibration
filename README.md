@@ -114,10 +114,6 @@ Fukasawa moment computation. For numerical integration, we use cubic spline inte
 In the formula from Theorem 2, all terms are straightforward to compute except for the matrix ML-function. First, we decompose the matrix into a unitary and an upper triangular matrices using the Schur decomposition. This allows us to shift to computing the target function from the upper triangular
 matrix $Z$. The values on the diagonal blocks of matrix $Z$ are computed using the scalar Mittag-Leffler function and its derivatives at the eigenvalue points, using Djrbashian-type summation formulas. Then, to compute the off-diagonal blocks, we apply the Parlett recurrence method. For more details, see [5], where the authors implemented a more general algorithm in MATLAB. But here, we did our own implementation in Python [Implementation/MomentsCalculation](Implementation/MomentsCalculation/), combining their ideas and our special case of fractional Heston model.
 
-The charts show a comparison of our implementation against the benchmark MATLAB algorithm. As you can see in the bottom graph, our execution time is around one millisecond, whereas their universal approach takes hundreds of milliseconds. At the same time, the top graph demonstrates that the relative error of our matrix function remains at machine precision.
-
-<img src="Charts/mittag_leffler_comparison.png" width="700" alt="ML comparison">
-
 ### Moment comparison: Mittag-Leffler vs. Fukasawa vs. Monte-Carlo
 Before running the calibrator, we must ensure all algorithm components work harmoniously. This chart compares moments obtained in three different ways: analytically via the Mittag-Leffler function, empirically via Fukasawa integrals (from observed data) and numerically using Monte Carlo simulations. For all moments, we can see the excellent agreement: the Monte Carlo estimates clearly converge to our analytical values (the red dashed line). Furthermore, both theoretical and observed moments lie strictly within the 95% Monte Carlo confidence intervals. This fully validates the correctness of our methodology.
 
