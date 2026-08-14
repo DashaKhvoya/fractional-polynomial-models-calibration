@@ -8,40 +8,38 @@ The project extends the computationally efficient **implicit moments calibration
 
 > *Can the parameters of a fractional polynomial model be efficiently calibrated using the implicit moments method? In particular, is it possible to recover the long-range dependence parameter α directly from volatility smiles?*
 
-As a result, we developed a fast calibration pipeline that successfully isolates and recovers the long-range dependence parameter $\alpha$ with high accuracy ($|\alpha_\Delta| < 6.5\%$ for all the experiments). 
-
----
+As a result, we developed a fast calibration pipeline that successfully isolates and recovers the long-range dependence parameter $\alpha$ with high accuracy ($|\alpha_\Delta| < 6.5\\%$ for all the experiments). 
 
 ## Methodology & pipeline
 
 On the one hand, the Fukasawa formula allows us to extract all moments of the logarithmic price process directly from implied volatility curves. On the other hand, for the class of fractional polynomial processes, these same moments can be quickly computed analytically using the matrix Mittag-Leffler function for the extended generator matrix. Since the second method depends directly on the model parameters, we need to optimize them so that the theoretical moments match the model-free market moments obtained via Fukasawa.
 
 ```
-                      ┌─────────────────────────────────────────┐                      ┌─────────────────────────────────────────────────────┐
-                      │              Market data                │                      │                Fractional Heston model              │
-                      │         Implied volatility smiles       │                      |Parameters: $\kappa, \theta, \eta, \rho, v_0, \alpha$|
-                      └────────────────────┬────────────────────┘                      └───────────────────────────┬─────────────────────────┘
-                                           │                                                                       │
-                                           ▼                                                                       ▼
-                      ┌─────────────────────────────────────────┐                              ┌─────────────────────────────────────────┐
-                      │            Fukasawa formula             │                              │           Extended generator            │
-                      │          Numerical integration          │                              │        Mittag-Leffler function          │
-                      └────────────────────┬────────────────────┘                              └───────────────────┬─────────────────────┘
-                                           │                                                                       │
-                                           ▼                                                                       ▼
-                      ┌─────────────────────────────────────────┐                             ┌───────────────────────────────────────────┐
-                      │        Empirical market moments         │                             │            Theoretical moments            │
-                      │             $E_F[(\ln(S_T/F))^m]$       │                             │           $E_ML[(\ln(S_T/F))^m]$          │
-                      └────────────────────┬────────────────────┘                             └────────────────────┬──────────────────────┘
-                                           │                                                                       │
-                                           │                                                                       │
-                                           └────────────────────────────┐               ┌──────────────────────────┘
-                                                                        │               │
-                                                                        ▼               ▼
-                                                           ┌──────────────────────────────────────────┐
-                                                           │          Parameter optimization          │
-                                                           |      Minimize relative moment error      |
-                                                           └──────────────────────────────────────────┘                                     
+┌─────────────────────────────────────────┐                               ┌──────────────────────────────────────┐
+│              Market data                │                               │       Fractional Heston model        │
+│         Implied volatility smiles       │                               |    Parameters: κ, θ, η, ρ, v0, α     |
+└────────────────────┬────────────────────┘                               └──────────────────┬───────────────────┘
+                     │                                                                       │
+                     ▼                                                                       ▼
+┌─────────────────────────────────────────┐                              ┌─────────────────────────────────────────┐
+│            Fukasawa formula             │                              │           Extended generator            │
+│          Numerical integration          │                              │        Mittag-Leffler function          │
+└────────────────────┬────────────────────┘                              └───────────────────┬─────────────────────┘
+                     │                                                                       │
+                     ▼                                                                       ▼
+┌─────────────────────────────────────────┐                             ┌───────────────────────────────────────────┐
+│        Empirical market moments         │                             │            Theoretical moments            │
+│           E_F[(ln(S_T/F))^m]            │                             │            E_ML[(ln(S_T/F))^m]            │
+└────────────────────┬────────────────────┘                             └────────────────────┬──────────────────────┘
+                     │                                                                       │
+                     │                                                                       │
+                     └────────────────────────────┐               ┌──────────────────────────┘
+                                                  │               │
+                                                  ▼               ▼
+                                     ┌──────────────────────────────────────────┐
+                                     │          Parameter optimization          │
+                                     |      Minimize relative moment error      |
+                                     └──────────────────────────────────────────┘                                     
 ```
 
 ### Fractional polynomial processes
