@@ -153,13 +153,12 @@ As part of future work, it is possible to improve parameter identifiability by f
 3. **J. Gatheral, A. Jacquier** (2014). *Arbitrage-free SVI volatility surfaces*. Quantitative Finance, 14(1):59–71.
 4. **A. Aurell** (2014). *The SVI implied volatility model and its calibration*. Master's Thesis.
 5. **R. Garrappa, M. Popolizio** (2018). *Computing the matrix Mittag–Leffler function with applications to fractional calculus*. Journal of Scientific Computing, 77(1):129–153.
-6. **L. Ortscheidt** (2020). *Implicit moments method for the calibration of polynomial stochastic volatility models*. Master's Thesis.
+6. **L. Ortscheidt**. *Implicit moments method for the calibration of polynomial stochastic volatility models*. Master's Thesis.
 
 ---
 
 **Author:** Daria Baranchikova  
 **Academic Supervisor:** Prof. Dr. Martin Keller-Ressel  
 **Institution:** Technische Universität Dresden (TU Dresden) 
-**Date:** August 2026
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the MIT License.
