@@ -6,7 +6,7 @@ This repository contains the Python implementation for the Master's Thesis **"Ca
 
 The project extends the computationally efficient **implicit moments calibration method** [6] from classical Markovian polynomial processes to **non-Markovian fractional polynomial processes**, specifically focusing on the **fractional Heston model**. The research question can be formulated as follows:
 
-> *Can the parameters of a fractional polynomial model be efficiently calibrated using the implicit moments method? In particular, is it possible to recover the long-range dependence parameter $\alpha$ directly from volatility smiles?*
+> *Can the parameters of a fractional polynomial model be efficiently calibrated using the implicit moments method? In particular, is it possible to recover the long-range dependence parameter α directly from volatility smiles?*
 
 As a result, we developed a fast calibration pipeline that successfully isolates and recovers the long-range dependence parameter $\alpha$ with high accuracy ($|\alpha_\Delta| < 6.5\%$ for all the experiments). 
 
