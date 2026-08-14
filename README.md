@@ -117,30 +117,32 @@ matrix $Z$. The values on the diagonal blocks of matrix $Z$ are computed using t
 ### Moment comparison: Mittag-Leffler vs. Fukasawa vs. Monte-Carlo
 Before running the calibrator, we must ensure all algorithm components work harmoniously. This chart compares moments obtained in three different ways: analytically via the Mittag-Leffler function, empirically via Fukasawa integrals (from observed data) and numerically using Monte Carlo simulations. For all moments, we can see the excellent agreement: the Monte Carlo estimates clearly converge to our analytical values (the red dashed line). Furthermore, both theoretical and observed moments lie strictly within the 95% Monte Carlo confidence intervals. This fully validates the correctness of our methodology.
 
-<img src="Charts/moment_convergence.png" width="500" alt="Moment comparison">
+<img src="Charts/moment_convergence.png" width="800" alt="Moment comparison">
 
 Finally, we can calibrate our model using differential evolution algorithm: [Implementation/model_calibration.py](Implementation/model_calibration.py)
 
 ## Key results & findings
-Now let's move on to the calibration results. 
+Now let's move on to the calibration results (in the table, all relative errors are given in %). 
 
-- **Exceptional $\alpha$ recovery:** Across all experiments, the memory parameter $\alpha$ is isolated and recovered with high precision ($|\alpha_\Delta| < 6.5\%$).
+- **Exceptional $\alpha$ recovery:** Across all experiments, the memory parameter $\alpha$ is isolated and recovered with high precision ($|\alpha_\Delta| < 6.5\\%$).
 - **Computational efficiency:** The matrix Mittag-Leffler function implementation executes in $\sim 1\text{ ms}$, making calibration computationally feasible.
-- **Parameter identifiability analysis:** Demonstrates that while calibrated models achieve near-perfect fits to market implied volatility smiles, standard parameters $(\kappa, \theta, \eta, \rho, v_0)$ exhibit ambiguities (different parameter combinations producing virtually identical smiles).
+- **Parameter identifiability analysis:** Calibrated models achieve near-perfect fits to market implied volatility smiles, while standard parameters $(\kappa, \theta, \eta, \rho, v_0)$ exhibit ambiguities (different parameter combinations producing virtually identical smiles).
 
-| Regime | $\alpha_{\text{true}}$ | Error ($\text{err}$) | $\kappa_\Delta (\%)$ | $\theta_\Delta (\%)$ | $\eta_\Delta (\%)$ | $\rho_\Delta (\%)$ | $v_{0,\Delta} (\%)$ | $\alpha_\Delta (\%)$ |
+| Exp | $\alpha_{\text{true}}$ | err | $\kappa_\Delta$ | $\theta_\Delta$ | $\eta_\Delta$ | $\rho_\Delta$ | $v_{0,\Delta}$ | $\alpha_\Delta$ |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Vanilla Market** | 1.0 | 51.48 | -17.62 | +4.75 | -13.90 | -9.40  | -3.50 | **-2.24** |
-| **Vanilla Market** | 0.7 | 70.48 | -14.66 | +7.83 | -21.27 | -15.03 | -7.88 | **-3.81** |
-| **Vanilla Market** | 0.3 | 80.82 | -30.93 | -4.65 | -24.42 | -14.16 | +4.77 | **+1.89** |
-| **High Leverage**  | 1.0 | 45.05 | +0.43  | 0.00  | -22.35 | -21.12 | -0.25 | **-0.87** |
-| **High Leverage**  | 0.7 | 240.22| +115.81| +12.27| +63.00 | -18.79 | +26.30| **-4.04** |
-| **Feller Fail**    | 1.0 | 22.73 | +8.88  | 0.00  | +2.70  | -4.62  | +6.47 | **0.00**  |
-| **Feller Fail**    | 0.7 | 56.53 | -17.71 | -3.97 | -20.88 | -7.61  | -2.18 | **+4.20** |
+| **Vanilla Market** | 1.0 | 51.48 | -17.62 | 4.75 | -13.90 | -9.40  | -3.50 | **-2.24** |
+| **Vanilla Market** | 0.7 | 70.48 | -14.66 | 7.83 | -21.27 | -15.03 | -7.88 | **-3.81** |
+| **Vanilla Market** | 0.3 | 80.82 | -30.93 | -4.65 | -24.42 | -14.16 | 4.77 | **1.89** |
+| **High Leverage** | 1.0 | 45.05 | 0.43  | 0.00  | -22.35 | -21.12 | -0.25 | **-0.87** |
+| **High Leverage**  | 0.7 | 240.22| 115.81| 12.27| 63.00 | -18.79 | 26.30| **-4.04** |
+| **High Leverage** | 0.3 | 314.03 | 46.83  | -2.00  | 184.85 | 49.38 | 24.65 | **6.33** |
+| **Feller Fail** | 1.0 | 22.73 | 8.88  | 0.00  | 2.70  | -4.62  | 6.47 | **0.00**  |
+| **Feller Fail**    | 0.7 | 56.53 | -17.71 | -3.97 | -20.88 | -7.61  | -2.18 | **4.20** |
+| **Feller Fail** | 0.3 | 115.84 | -25.69  | 7.52  | -34.65  | -14.32  | -29.22 | **-4.47**  |
 
-<img src="Charts/calibration_ivs.png" width="500" alt="Calibration results">
+<img src="Charts/calibration_ivs.png" width="800" alt="Calibration results">
 
-As part of future work, it is possible to improve parameter identifiability by fixing certain parameters (e.g., $v_0$ can be effectively recovered) and reducing the dimensionality of the problem.
+As a part of future work, it is possible to improve parameter identifiability by fixing certain parameters (e.g., $v_0$ can be effectively recovered) and reducing the dimensionality of the problem.
 
 ---
 
