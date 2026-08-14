@@ -42,6 +42,8 @@ On the one hand, the Fukasawa formula allows us to extract all moments of the lo
                                    └──────────────────────────────────────────┘                                     
 ```
 
+Below, we briefly outline the necessary theory for a better understanding.
+
 ### Fractional polynomial processes
 A **polynomial process** $X_t$ is a Markov process with extended generator $\mathbb{G}$, such that $\forall k \geq 0: \mathbb{G}(\mathcal{P}_k) \subseteq \mathcal{P}_k$, i.e., its generator maps polynomials to polynomials of the same or lower degree.
 
@@ -56,22 +58,26 @@ A **fractional polynomial process** $Y_t = X_{L_t}$ is constructed by time-chang
 Empirical moments of the log-price process are extracted directly from observable implied volatility smiles without assuming a specific underlying model:
 
 > **Theorem 1** (*Fukasawa moment formula* [1]).  
-> *Let $\Psi$ be an absolutely continuous function with derivative $\Psi'$ of polynomial growth. Let $g_1$ and $g_2$ be the inverse functions of normalizing transformations $f_1$ and $f_2$. If there exists $q > 0$ such that $\mathbb{E}[S_T^{-q}] < \infty$, then:*
+> Let $\Psi$ be an absolutely continuous function with derivative $\Psi'$ of polynomial growth. Let $g_1$ and $g_2$ be the inverse functions of normalizing transformations $f_1$ and $f_2$. If there exists $q > 0$ such that $\mathbb{E}[S_T^{-q}] < \infty$, then:
 >
-> $$\mathbb{E}\left[\Psi \left(\log\frac{S_T}{F}\right)\right] = \int_{-\infty}^{\infty} \left\{ \Psi(g_2(z)) - \Psi'(g_2(z)) + \Psi'(g_1(z))e^{-g_1(z)} \right\} \varphi(z) dz.$$
+> $$\mathbb{E}\left[\Psi \left(\log\frac{S_T}{F}\right)\right] = \int_{-\infty}^{\infty} \left\\{ \Psi(g_2(z)) - \Psi'(g_2(z)) + \Psi'(g_1(z))e^{-g_1(z)} \right\\} \varphi(z) dz.$$
 
 ### Theoretical moments (matrix Mittag-Leffler function)
-We must be able to compute the exact same moments for our specific model. In the classical Markov case, conditional moments of a polynomial process $X_t$ are easily computed using a matrix exponential. However, as we discussed, replacing time with the inverse $\alpha$-stable subordinator $L_t$ means the Markov property is lost. Nevertheless, the structure is preserved in a very elegant way. For fractional polynomial processes, the matrix exponential is simply replaced by the matrix Mittag-Leffler function. Theoretical moments for fractional polynomial processes are computed in closed form:
+We must be able to compute the exact same moments for our specific model. In the classical Markov case, conditional moments of a polynomial process $X_t$ are easily computed using a matrix exponential. However, as we mentioned, replacing time with the inverse $\alpha$-stable subordinator $L_t$ means the Markov property is lost. Nevertheless, the structure is preserved in a very elegant way. For fractional polynomial processes, the matrix exponential is simply replaced by the matrix Mittag-Leffler function. Theoretical moments for fractional polynomial processes are computed in closed form:
 
 > **Theorem 2** (*Mittag-Leffler moment formula* [2]).  
-> *Let $S$ be a closed subset of $\mathbb{R}^d$, and $L_t$ be the inverse $\alpha$-stable subordinator with $\alpha \in (0,1)$. Let $X_t$ be $m$-polynomial process with generator $\mathcal{G}$, and let $A \in \mathbb{R}^{N \times N}$ be the matrix representation of $\mathcal{G}$ in a basis $H(x)$ of $\mathcal{P}_m$, then*
+> Let $S$ be a closed subset of $\mathbb{R}^d$, and $L_t$ be the inverse $\alpha$-stable subordinator with $\alpha \in (0,1)$. Let $X_t$ be $m$-polynomial process with generator $\mathcal{G}$, and let $A \in \mathbb{R}^{N \times N}$ be the matrix representation of $\mathcal{G}$ in a basis $H(x)$ of $\mathcal{P}_m$, then
 >
 > $$\forall p \in \mathcal{P}_m, x \in S \qquad \mathbb{E}_x \left[ p(X_{L_t}) \right] = H(x)^T E_{\alpha}(t^{\alpha}A) \vec{p}, t > 0.$$
-
-where $E_\alpha(z) = \sum_{k = 0}^\infty \frac{z^k}{\Gamma(\alpha k + 1)}, z \in \mathbb{C}$ and $\vec{p}$ is the coordinate representation of the polynomial $p$ in the basis $H(x)$.
+> 
+> where
+>
+> $$E_\alpha(z) = \sum_{k = 0}^\infty \frac{z^k}{\Gamma(\alpha k + 1)}, z \in \mathbb{C}$$
+>
+> and $\vec{p}$ is the coordinate representation of the polynomial $p$ in the basis $H(x)$.
 
 ### Calibration
-By combining the previous two results, we can formalize the calibration problem. Our goal is to find a parameter set $\Theta$ that minimizes the error between market data and theory. Let $L_{t,m}$ be the empirical moments obtained by integrating the Fukasawa formula and $R_{t,m}$ be the theoretical moments computed via the Mittag-Leffler function, which depends on the parameters. We minimize the sum of squared relative errors across different expiration times $T$ and moment orders $m$, using also weights $w$ for balancing the integration error and keeping the calibration algorithm stable.
+By combining the previous two results, we can formalize the calibration problem. Our goal is to find a parameter set $\Theta$ that minimizes the error between market data and theory. Let $L_{t,m}$ be the empirical moments obtained by integrating the Fukasawa formula and $R_{t,m}$ be the theoretical moments computed via the Mittag-Leffler function, which depends on the parameters. We minimize the sum of squared relative errors across different expiration times $T$ and moment orders $m$, using also weights $w$ for balancing the integration error and keeping the calibration algorithm stable:
 
 $$\min_{\Theta} \sum_{t \in \{T_1, ..., T_n\}} \sum_{m = 1}^M w_{t,m} \left( \frac{\mathcal{L}_{t,m} - \mathcal{R}_{t,m}(\Theta)}{\mathcal{L}_{t,m}} \right)^2$$
 
