@@ -96,13 +96,13 @@ Volatility smiles for all 24 tests and expiration times can be found here: [Simu
 ### Fukasawa: SVI-extrapolation and numerical integration
 The Fukasawa formula requires computing an integral over an infinite interval. However, in practice, the available market option strikes are strictly bounded. This graph shows the integrands for moments of order 1-4. The red dots represent values we can obtain directly from observable market data. As you can see, they only cover the central part, and the integrand does not converge to zero within this range. 
 
-<img src="Charts/observed_vs_extrapolated_integrands.png" width="500" alt="Integrands comparison">
+<img src="Charts/observed_vs_extrapolated_integrands.png" width="1000" alt="Integrands comparison">
 
 The solution to this problem is extrapolating the implied volatility smile beyond observable strikes using the Stochastic Volatility Inspired (SVI) parameterization:
 
 $$w(x) = a + b(\rho(x-m) + \sqrt{(x-m)^2 + \sigma^2})$$, where $w(x) := \sigma_{IV}(x)^2 T$.
 
-To make calibration efficient, we split the parameters into non-linear and linear groups. To optimize the non-linear part, we use the Nelder-Mead method with probabilistic restarts. This reduces the chance of getting stuck in a local minimum. The linear part is solved analytically as a simple $3 \times 3$ system
+To make SVI-calibration efficient, we split the parameters into non-linear and linear groups. To optimize the non-linear part, we use the Nelder-Mead method with probabilistic restarts. This reduces the chance of getting stuck in a local minimum. The linear part is solved analytically as a simple $3 \times 3$ system
 of linear equations. Then, to avoid arbitrage, we check Durrleman's condition. If violated, the model switches to Jump-Wing parameterization for arbitrage elimination. Below is the result of our extrapolation. For a more precise description of this method you can read [3], [4] and find the implementation in [Implementation/MomentsCalculation](Implementation/MomentsCalculation/).
 
 <img src="Charts/svi_extrapolation.png" width="500" alt="SVI extrapolation">
