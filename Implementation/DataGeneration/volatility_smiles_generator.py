@@ -10,9 +10,9 @@ os.makedirs(output_dir, exist_ok=True)
 # Common base parameters
 S0 = 100.0
 r = 0.02
-dt = 1/252
+dt = 1/504
 ds = 0.002
-n_paths = 100000
+n_paths = 1000000
 
 # 8 maturities (3:24 months)
 T_array = [0.25, 0.50, 0.75, 1.00, 1.25, 1.5, 1.75, 2.0]
@@ -57,9 +57,15 @@ for idx, exp in enumerate(experiments, 1):
     v0_val = exp["v0"]
     alpha_val = exp["alpha"]
 
+    filepath = os.path.join(output_dir, f"{exp_id}.npz")
+    if os.path.exists(filepath):
+        print(f"\n[{idx}/24] Skipping {exp_id} (already exists: {filepath})")
+        continue
+
     print(f"\n[{idx}/24] Generating {exp_id}")
     t0 = time.time()
 
+    # smiles, rse, k_grids matrices of shape (8, 41)
     all_smiles, all_rse, all_k_grids, all_moments, all_moments_se = volatility_smile.build_volatility_smile(
         S0, v0_val, kappa_val, theta_val, eta_val, rho_val, r, T_array, dt, ds, alpha_val, n_paths
     )
