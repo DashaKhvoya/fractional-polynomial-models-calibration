@@ -8,16 +8,16 @@ def build_volatility_smile(S0, v0, kappa, theta, eta, rho, r, T_array, dt, ds, a
     maturities = [float(T_array)] if is_scalar else [float(t) for t in T_array]
     T_max = max(maturities)
 
-    paths_matrix = []
-    t_grid = None
+    t_grid = np.arange(0, T_max + dt / 2.0, dt)
+    maturity_indices = [np.argmin(np.abs(t_grid - T)) for T in maturities]
 
-    for _ in range(n_paths):
-        t_grid, _, S_path, _ = heston_fractional.single_path_fractional_heston(
+    S_T_matrix = np.empty((n_paths, len(maturities)), dtype=np.float64)
+
+    for p in range(n_paths):
+        _, _, S_path, _ = heston_fractional.single_path_fractional_heston(
             S0, v0, kappa, theta, eta, rho, r, T_max, dt, ds, alpha
         )
-        paths_matrix.append(S_path)
-
-    paths_matrix = np.array(paths_matrix)
+        S_T_matrix[p, :] = S_path[maturity_indices]
 
     all_smiles = []
     all_rse = []
@@ -29,9 +29,9 @@ def build_volatility_smile(S0, v0, kappa, theta, eta, rho, r, T_array, dt, ds, a
         0.25: 0.5, 0.50: 0.6, 0.75: 0.7, 1.00: 0.8, 
         1.25: 0.9, 1.50: 1.0, 1.75: 1.1, 2.00: 1.2}
 
-    for T in maturities:
-        idx_T = np.argmin(np.abs(t_grid - T))
-        S_T_paths = paths_matrix[:, idx_T].copy()
+    # 2. Extract price slices for each T in maturities
+    for idx_mat, T in enumerate(maturities):
+        S_T_paths = S_T_matrix[:, idx_mat].copy()
 
         F = S0 * np.exp(r * T)
         F_forward = np.mean(S_T_paths)
@@ -42,13 +42,14 @@ def build_volatility_smile(S0, v0, kappa, theta, eta, rho, r, T_array, dt, ds, a
 
         mc_moments = {}
         mc_moments_se = {}
-        for m in [1, 2, 3, 4]:
+        for m in [1, 2, 3, 4, 5, 6]:
             X_m = np.log(S_T_paths / F) ** m
             mc_moments[m] = np.mean(X_m)
             mc_moments_se[m] = np.std(X_m) / np.sqrt(len(S_T_paths))
 
+        # Dynamic k_grid per maturity T (41 points)
         bound = k_grid_bounds[round(T, 2)]
-        k_grid = np.linspace(-bound, bound, 51)
+        k_grid = np.linspace(-bound, bound, 41)
 
         implied_vols = []
         rse_list = []
@@ -67,7 +68,7 @@ def build_volatility_smile(S0, v0, kappa, theta, eta, rho, r, T_array, dt, ds, a
                 mc_forward_price = np.mean(payoffs)
                 bs_fun = lambda vol: F * (np.exp(k) * norm.cdf(k/vol + vol/2) - norm.cdf(k/vol - vol/2))
 
-            # RSE calculation
+            # Relative Standard Error (RSE) calculation
             mean_val = np.mean(payoffs)
             std_val = np.std(payoffs)
             if mean_val > 1e-9:
