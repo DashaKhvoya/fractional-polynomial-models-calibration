@@ -25,6 +25,13 @@ def generate_probabilistic_population(bounds, popsize):
 def objective(params, T_array, moments, fukasawa_moments, weights_dict):
     kappa, theta, eta, rho, v0, alpha = params
 
+    try:
+        ml_moments = moments_mittag_leffler.ml_all_moments(
+            kappa, theta, eta, rho, v0, alpha, T_array, moments
+        )
+    except Exception:
+        return 1e9
+
     total_loss = 0.0
     epsilon = 5e-4
 
@@ -32,12 +39,8 @@ def objective(params, T_array, moments, fukasawa_moments, weights_dict):
         for m in moments:
             f_m = fukasawa_moments[(T, m)]
             w_Tm = weights_dict[(T, m)]
-
-            try:
-                ml_m = moments_mittag_leffler.ml_moment(m, kappa, theta, eta, rho, v0, T, alpha)
-                total_loss += w_Tm * (((f_m - ml_m) / (abs(f_m) + epsilon))**2)
-            except Exception:
-                return 1e9
+            ml_m = ml_moments[(T, m)]
+            total_loss += w_Tm * (((f_m - ml_m) / (abs(f_m) + epsilon))**2)
 
     return total_loss
 
@@ -80,7 +83,8 @@ def calibrate_fractional_heston(T_array, moments, smiles_dict, k_grid_dict, weig
         recombination=0.5,
         polish=True,
         strategy='best1bin',
-        workers=1,
+        workers=6,
+        updating='deferred',
         disp=True)
 
     return result.x
