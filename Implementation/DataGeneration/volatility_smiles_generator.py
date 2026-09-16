@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import time
-import volatility_smile
+from DataGeneration import volatility_smile
 
 # Create output folder for dataset
 output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../SimulatedData"))
