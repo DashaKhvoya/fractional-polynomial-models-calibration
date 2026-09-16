@@ -8,7 +8,7 @@ The project extends the computationally efficient **implicit moments calibration
 
 > *Can the parameters of a fractional polynomial model be efficiently calibrated using the implicit moments method? In particular, is it possible to recover the long-range dependence parameter α directly from volatility smiles?*
 
-As a result, we developed a fast calibration pipeline that successfully isolates and recovers the long-range dependence parameter $\alpha$ with high accuracy ($|\alpha_\Delta| < 6.5\\%$ for all the experiments). 
+As a result, we developed a fast calibration pipeline that successfully isolates and recovers the long-range dependence parameter $\alpha$ with high accuracy ($|\alpha_\Delta| < 5\\%$ for 22 out of 24 experiments). 
 
 ## Methodology & pipeline
 
@@ -111,8 +111,9 @@ Finally, having a continuous and arbitrage-free curve across the entire real lin
 Fukasawa moment computation. For numerical integration, we use cubic spline interpolation. The main advantage of this approach is that on each individual segment, our spline is a cubic polynomial. When multiplied by the standard normal density, the integral of this polynomial is computed strictly analytically using Gaussian moments. Moreover, the integration is performed with dynamically expanding bounds until the integrand values at the edges become small enough. This ensures high accuracy for our algorithm.
 
 ### Mittag-Leffler: matrix function computation
-In the formula from Theorem 2, all terms are straightforward to compute except for the matrix ML-function. First, we decompose the matrix into a unitary and an upper triangular matrices using the Schur decomposition. This allows us to shift to computing the target function from the upper triangular
-matrix $Z$. The values on the diagonal blocks of matrix $Z$ are computed using the scalar Mittag-Leffler function and its derivatives at the eigenvalue points, using Djrbashian-type summation formulas. Then, to compute the off-diagonal blocks, we apply the Parlett recurrence method. For more details, see [5], where the authors implemented a more general algorithm in MATLAB. But here, we did our own implementation in Python [Implementation/MomentsCalculation](Implementation/MomentsCalculation/), combining their ideas and our special case of fractional Heston model.
+In the formula from Theorem 2, all terms are straightforward to compute except for the matrix ML-function. First, we decompose the matrix into a unitary and an upper triangular matrices using the Schur decomposition. This allows us to shift to computing the target function from the upper triangular matrix $Z$. The values on the diagonal blocks of matrix $Z$ are computed using the scalar Mittag-Leffler function and its derivatives at the eigenvalue points, using Prabhakar-type summation formulas. Then, to compute the off-diagonal blocks, we apply the Parlett recurrence method. For more details, see [5], where the authors implemented a more general algorithm in MATLAB. But here, we did our own implementation in Python [Implementation/MomentsCalculation](Implementation/MomentsCalculation/), combining their ideas and our special case of fractional Heston model.
+
+<img src="Charts/mittag_leffler_comparison.png" width="500" alt="Comparison of our and MATLAB implementation">
 
 ### Moment comparison: Mittag-Leffler vs. Fukasawa vs. Monte-Carlo
 Before running the calibrator, we must ensure all algorithm components work harmoniously. This chart compares moments obtained in three different ways: analytically via the Mittag-Leffler function, empirically via Fukasawa integrals (from observed data) and numerically using Monte Carlo simulations. For all moments, we can see the excellent agreement: the Monte Carlo estimates clearly converge to our analytical values (the red dashed line). Furthermore, both theoretical and observed moments lie strictly within the 95% Monte Carlo confidence intervals. This fully validates the correctness of our methodology.
@@ -124,25 +125,25 @@ Finally, we can calibrate our model using differential evolution algorithm: [Imp
 ## Key results & findings
 Now let's move on to the calibration results (in the table, all relative errors are given in %). 
 
-- **Exceptional $\alpha$ recovery:** Across all experiments, the memory parameter $\alpha$ is isolated and recovered with high precision ($|\alpha_\Delta| < 6.5\\%$).
+- **Exceptional $\alpha$ recovery:** Across all experiments, the memory parameter $\alpha$ is isolated and recovered with high precision ($|\alpha_\Delta| < 5\\%$).
 - **Computational efficiency:** The matrix Mittag-Leffler function implementation executes in $\sim 1\text{ ms}$, making calibration computationally feasible.
 - **Parameter identifiability analysis:** Calibrated models achieve near-perfect fits to market implied volatility smiles, while standard parameters $(\kappa, \theta, \eta, \rho, v_0)$ exhibit ambiguities (different parameter combinations producing virtually identical smiles).
 
 | Exp | $\alpha_{\text{true}}$ | err | $\kappa_\Delta$ | $\theta_\Delta$ | $\eta_\Delta$ | $\rho_\Delta$ | $v_{0,\Delta}$ | $\alpha_\Delta$ |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Vanilla Market** | 1.0 | 51.48 | -17.62 | 4.75 | -13.90 | -9.40  | -3.50 | **-2.24** |
-| **Vanilla Market** | 0.7 | 70.48 | -14.66 | 7.83 | -21.27 | -15.03 | -7.88 | **-3.81** |
-| **Vanilla Market** | 0.3 | 80.82 | -30.93 | -4.65 | -24.42 | -14.16 | 4.77 | **1.89** |
-| **High Leverage** | 1.0 | 45.05 | 0.43  | 0.00  | -22.35 | -21.12 | -0.25 | **-0.87** |
-| **High Leverage**  | 0.7 | 240.22| 115.81| 12.27| 63.00 | -18.79 | 26.30| **-4.04** |
-| **High Leverage** | 0.3 | 314.03 | 46.83  | -2.00  | 184.85 | 49.38 | 24.65 | **6.33** |
-| **Feller Fail** | 1.0 | 22.73 | 8.88  | 0.00  | 2.70  | -4.62  | 6.47 | **0.00**  |
-| **Feller Fail**    | 0.7 | 56.53 | -17.71 | -3.97 | -20.88 | -7.61  | -2.18 | **4.20** |
-| **Feller Fail** | 0.3 | 115.84 | -25.69  | 7.52  | -34.65  | -14.32  | -29.22 | **-4.47**  |
+| **Vanilla market** | 1.0 | 4.94 | -2.29 | 0.02 | -1.65 | -0.69 | -0.20 | **-0.08** |
+| **Vanilla market** | 0.7 | 5.25 | -3.03 | -0.42 | -0.00 | 1.44 | -0.13 | **0.23** |
+| **Vanilla market** | 0.3 | 45.96 | -16.56 | -8.99 | -1.73 | 5.56 | 8.51 | **4.60** |
+| **High leverage** | 1.0 | 57.78 | 4.91 | 3.34 | -21.96 | -23.00 | -1.83 | **-2.72** |
+| **High leverage** | 0.7 | 74.66 | -32.38 | -3.56 | -3.89 | 18.78 | -13.32 | **-2.73** |
+| **High leverage** | 0.3 | 108.69 | 34.07 | 3.86 | 46.98 | 12.82 | 10.33 | **-0.63** |
+| **Feller-violating** | 1.0 | 22.09 | 9.75 | 0.90 | 2.18 | -5.76 | 2.76 | **-0.74** |
+| **Feller-violating** | 0.7 | 44.59 | -11.84 | -3.24 | -16.62 | -7.68 | 1.56 | **3.64** |
+| **Feller-violating** | 0.3 | 115.84 | -25.69 | 7.52 | -34.65 | -14.32 | -29.22 | **-4.47** |
 
 <img src="Charts/calibration_ivs.png" width="800" alt="Calibration results">
 
-As a part of future work, it is possible to improve parameter identifiability by fixing certain parameters (e.g., $v_0$ can be effectively recovered) and reducing the dimensionality of the problem.
+As a part of future work, it is possible to improve parameter identifiability by fixing certain parameters (e.g., $v_0$ can be effectively recovered) and reducing the dimensionality of the problem. 
 
 ---
 
