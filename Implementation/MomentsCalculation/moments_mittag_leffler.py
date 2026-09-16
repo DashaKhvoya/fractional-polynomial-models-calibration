@@ -66,7 +66,6 @@ def get_evaluate_basis(m):
         evaluate_basis = sp.lambdify((x, nu), H_basis, "numpy")
 
         p = np.zeros(len(H_basis))
-        x = sp.symbols("x")
         p_idx = H_basis.index(x**m)
         p[p_idx] = 1.0
 
@@ -160,29 +159,30 @@ def compute_offdiagonal_blocks(Z, F, block_sizes):
     start_id.append(curr)
 
     for i in range(len(block_sizes) - 2, -1, -1):
-      for j in range(i + 1, len(block_sizes)):
-          slice_i = slice(start_id[i], start_id[i+1])
-          slice_j = slice(start_id[j], start_id[j+1])
+        for j in range(i + 1, len(block_sizes)):
+            slice_i = slice(start_id[i], start_id[i+1])
+            slice_j = slice(start_id[j], start_id[j+1])
 
-          Z_ii = Z[slice_i, slice_i]
-          Z_jj = Z[slice_j, slice_j]
+            Z_ii = Z[slice_i, slice_i]
+            Z_jj = Z[slice_j, slice_j]
 
-          Z_ij = Z[slice_i, slice_j]
-          F_ii = F[slice_i, slice_i]
-          F_jj = F[slice_j, slice_j]
-          R_ij = F_ii @ Z_ij - Z_ij @ F_jj
-          for k in range(i + 1, j):
-              slice_k = slice(start_id[k], start_id[k+1])
-              F_ik = F[slice_i, slice_k]
-              Z_kj = Z[slice_k, slice_j]
-              Z_ik = Z[slice_i, slice_k]
-              F_kj = F[slice_k, slice_j]
-              R_ij += F_ik @ Z_kj - Z_ik @ F_kj
+            Z_ij = Z[slice_i, slice_j]
+            F_ii = F[slice_i, slice_i]
+            F_jj = F[slice_j, slice_j]
+            R_ij = F_ii @ Z_ij - Z_ij @ F_jj
+            for k in range(i + 1, j):
+                slice_k = slice(start_id[k], start_id[k+1])
+                F_ik = F[slice_i, slice_k]
+                Z_kj = Z[slice_k, slice_j]
+                Z_ik = Z[slice_i, slice_k]
+                F_kj = F[slice_k, slice_j]
+                R_ij += F_ik @ Z_kj - Z_ik @ F_kj
 
-          F[slice_i, slice_j] = linalg.solve_sylvester(Z_ii, -Z_jj, R_ij)
+            F[slice_i, slice_j] = linalg.solve_sylvester(Z_ii, -Z_jj, R_ij)
             
     return F
 
+# Compute moment for one pair (m, T)
 def ml_moment(m, kappa, theta, eta, rho, v0, T, alpha):
     A = build_generator_matrix(m, 0.0, kappa, theta, eta, rho)
     
@@ -195,8 +195,33 @@ def ml_moment(m, kappa, theta, eta, rho, v0, T, alpha):
     E_alpha = Q @ F_T @ Q.T
     
     evaluate_basis, p = get_evaluate_basis(m)
-
     H_vector = np.array(evaluate_basis(0.0, v0))
 
     moment = H_vector.T @ E_alpha @ p
     return moment
+
+# Compute moments for arrays moments and T_array
+def ml_all_moments(kappa, theta, eta, rho, v0, alpha, T_array, moments):
+    results = {}
+    
+    for m in moments:
+        A = build_generator_matrix(m, 0.0, kappa, theta, eta, rho)
+
+        # A = Q * Z * Q^T
+        Z, Q = sort_schur(A)
+        block_sizes = get_block_sizes(Z)
+        
+        evaluate_basis, p = get_evaluate_basis(m)
+        H_vector = np.array(evaluate_basis(0.0, v0))
+        
+        for T in T_array:
+            # scaling (Z = T^alpha * Z)
+            Z_T = (T ** alpha) * Z
+            
+            F_T_diag = compute_diagonal_blocks(Z_T, block_sizes, alpha)
+            F_T = compute_offdiagonal_blocks(Z_T, F_T_diag, block_sizes)
+            E_alpha = Q @ F_T @ Q.T
+            
+            results[(T, m)] = H_vector.T @ E_alpha @ p
+            
+    return results
