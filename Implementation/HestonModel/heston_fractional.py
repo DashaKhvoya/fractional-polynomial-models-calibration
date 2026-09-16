@@ -1,6 +1,5 @@
 import numpy as np
-import subordinator
-import heston_classical
+from HestonModel import subordinator, heston_classical
 
 def single_path_fractional_heston(S0, v0, kappa, theta, eta, rho, r, T, dt, ds, alpha):
     if alpha == 1.0:
